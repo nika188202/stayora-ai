@@ -1,0 +1,9 @@
+import {NextResponse} from "next/server";
+import Stripe from "stripe";
+import {createAdminClient} from "@/lib/supabase/admin";
+const stripe=new Stripe(process.env.STRIPE_SECRET_KEY!);
+export async function POST(req:Request){const sig=req.headers.get("stripe-signature");if(!sig)return NextResponse.json({error:"Missing signature"},{status:400});let event:Stripe.Event;try{event=stripe.webhooks.constructEvent(await req.text(),sig,process.env.STRIPE_WEBHOOK_SECRET!);}catch(e:any){return NextResponse.json({error:`Webhook error: ${e.message}`},{status:400});}
+ const admin=createAdminClient();
+ if(event.type==="checkout.session.completed"){const s=event.data.object as Stripe.Checkout.Session;const userId=s.metadata?.supabase_user_id;const plan=s.metadata?.plan;if(userId&&s.subscription){const sub=await stripe.subscriptions.retrieve(s.subscription as string);await admin.from("subscriptions").upsert({user_id:userId,stripe_customer_id:String(s.customer),stripe_subscription_id:sub.id,plan,status:sub.status,current_period_end:new Date(sub.current_period_end*1000).toISOString()},{onConflict:"user_id"});}}
+ if(["customer.subscription.updated","customer.subscription.deleted"].includes(event.type)){const sub=event.data.object as Stripe.Subscription;const userId=sub.metadata?.supabase_user_id;if(userId){await admin.from("subscriptions").upsert({user_id:userId,stripe_customer_id:String(sub.customer),stripe_subscription_id:sub.id,plan:sub.metadata?.plan||"starter",status:sub.status,current_period_end:new Date(sub.current_period_end*1000).toISOString()},{onConflict:"user_id"});}}
+ return NextResponse.json({received:true});}

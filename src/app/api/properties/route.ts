@@ -1,0 +1,5 @@
+import {NextResponse} from "next/server";
+import {createClient} from "@/lib/supabase/server";
+import {z} from "zod";
+const schema=z.object({name:z.string().min(1).max(100),location:z.string().max(120).optional(),language:z.string().max(40).optional(),check_in:z.string().max(30).optional(),check_out:z.string().max(30).optional(),wifi_name:z.string().max(100).optional(),house_rules:z.string().max(2000).optional(),description:z.string().max(3000).optional()});
+export async function POST(req:Request){const supabase=createClient();const {data:{user}}=await supabase.auth.getUser();if(!user)return NextResponse.json({error:"Unauthorized"},{status:401});const parsed=schema.safeParse(await req.json());if(!parsed.success)return NextResponse.json({error:"Invalid property details"},{status:400});const {data:property,error}=await supabase.from("properties").insert({...parsed.data,user_id:user.id}).select("*").single();if(error)return NextResponse.json({error:error.message},{status:400});return NextResponse.json({property});}

@@ -1,0 +1,3 @@
+import Link from "next/link";
+import AuthForm from "@/components/AuthForm";
+export default function Signup(){return <div className="min-h-screen grid place-items-center p-5"><div className="w-full max-w-md bg-white border border-line rounded-3xl p-8 shadow-soft"><Link href="/" className="font-bold text-xl">stayora<span className="text-olive">.</span></Link><h1 className="text-2xl font-semibold mt-8">Create your account</h1><p className="text-sm text-muted mt-2">Start organizing your guest communication.</p><AuthForm mode="signup"/><p className="text-sm text-muted mt-6">Already registered? <Link className="text-olive font-semibold" href="/login">Log in</Link></p></div></div>}

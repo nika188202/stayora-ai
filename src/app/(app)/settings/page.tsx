@@ -1,0 +1,3 @@
+import AppShell from "@/components/AppShell";
+import {requireUser} from "@/lib/auth";
+export default async function Settings(){const {user}=await requireUser();return <AppShell title="Settings" subtitle="Your account details."><div className="max-w-2xl bg-white border border-line rounded-2xl p-6"><p className="text-xs uppercase tracking-widest text-muted">Account email</p><p className="font-semibold mt-2">{user.email}</p><p className="text-xs text-muted mt-6">To change your password, use the password reset flow configured in Supabase Auth. For privacy requests or account deletion, contact the service administrator until self-service controls are added.</p></div></AppShell>}

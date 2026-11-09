@@ -1,0 +1,3 @@
+import Link from "next/link";
+import AuthForm from "@/components/AuthForm";
+export default function Login(){return <div className="min-h-screen grid place-items-center p-5"><div className="w-full max-w-md bg-white border border-line rounded-3xl p-8 shadow-soft"><Link href="/" className="font-bold text-xl">stayora<span className="text-olive">.</span></Link><h1 className="text-2xl font-semibold mt-8">Welcome back</h1><p className="text-sm text-muted mt-2">Log in to your host workspace.</p><AuthForm mode="login"/><p className="text-sm text-muted mt-6">New to Stayora? <Link className="text-olive font-semibold" href="/signup">Create an account</Link></p></div></div>}

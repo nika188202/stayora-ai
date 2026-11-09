@@ -1,0 +1,8 @@
+"use client";
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+export default function AuthForm({mode}:{mode:"login"|"signup"}) {
+ const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [busy,setBusy]=useState(false); const [msg,setMsg]=useState("");
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setMsg(""); const supabase=createClient(); const result=mode==="signup"?await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin+"/auth/callback"}}):await supabase.auth.signInWithPassword({email,password}); setBusy(false); if(result.error){setMsg(result.error.message);return;} if(mode==="signup"&&!result.data.session){setMsg("Check your email to confirm your account.");return;} location.href="/dashboard"; }
+ return <form onSubmit={submit} className="space-y-4 mt-7"><label className="block text-sm">Email<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-2 w-full rounded-xl border border-line px-4 py-3 outline-olive"/></label><label className="block text-sm">Password<input required minLength={8} type="password" value={password} onChange={e=>setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-line px-4 py-3 outline-olive"/></label>{msg&&<p className="text-sm text-olive">{msg}</p>}<button disabled={busy} className="w-full rounded-xl bg-ink text-white py-3 font-semibold disabled:opacity-50">{busy?"Please wait…":mode==="signup"?"Create account":"Log in"}</button></form>;
+}
